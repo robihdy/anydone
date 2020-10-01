@@ -155,6 +155,17 @@ export type MeQuery = (
   )> }
 );
 
+export type QuestionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type QuestionsQuery = (
+  { __typename?: 'Query' }
+  & { questions: Array<(
+    { __typename?: 'Question' }
+    & Pick<Question, 'id' | 'createdAt' | 'updatedAt' | 'description'>
+  )> }
+);
+
 export const UserDataFragmentDoc = gql`
     fragment UserData on User {
   id
@@ -214,4 +225,18 @@ export const MeDocument = gql`
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const QuestionsDocument = gql`
+    query Questions {
+  questions {
+    id
+    createdAt
+    updatedAt
+    description
+  }
+}
+    `;
+
+export function useQuestionsQuery(options: Omit<Urql.UseQueryArgs<QuestionsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<QuestionsQuery>({ query: QuestionsDocument, ...options });
 };
