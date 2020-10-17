@@ -26,7 +26,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   } else {
     body = (
       <Flex>
-        <Box mr={2}>{data.me.username}</Box>
+        <Box mr={2}>{data.me.email}</Box>
         <Button
           onClick={() => {
             logout();

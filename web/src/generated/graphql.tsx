@@ -38,7 +38,7 @@ export type User = {
   id: Scalars['Float'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
-  username: Scalars['String'];
+  email: Scalars['String'];
 };
 
 export type Mutation = {
@@ -69,14 +69,13 @@ export type MutationDeleteRecipeArgs = {
 
 
 export type MutationRegisterArgs = {
-  password: Scalars['String'];
-  username: Scalars['String'];
+  options: RegisterInput;
 };
 
 
 export type MutationLoginArgs = {
   password: Scalars['String'];
-  username: Scalars['String'];
+  email: Scalars['String'];
 };
 
 export type UserResponse = {
@@ -91,13 +90,18 @@ export type FieldError = {
   message: Scalars['String'];
 };
 
+export type RegisterInput = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+};
+
 export type UserDataFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'username'>
+  & Pick<User, 'id' | 'email'>
 );
 
 export type LoginMutationVariables = Exact<{
-  username: Scalars['String'];
+  email: Scalars['String'];
   password: Scalars['String'];
 }>;
 
@@ -125,8 +129,7 @@ export type LogoutMutation = (
 );
 
 export type RegisterMutationVariables = Exact<{
-  username: Scalars['String'];
-  password: Scalars['String'];
+  options: RegisterInput;
 }>;
 
 
@@ -169,12 +172,12 @@ export type RecipesQuery = (
 export const UserDataFragmentDoc = gql`
     fragment UserData on User {
   id
-  username
+  email
 }
     `;
 export const LoginDocument = gql`
-    mutation Login($username: String!, $password: String!) {
-  login(username: $username, password: $password) {
+    mutation Login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
     errors {
       field
       message
@@ -199,8 +202,8 @@ export function useLogoutMutation() {
   return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
 export const RegisterDocument = gql`
-    mutation Register($username: String!, $password: String!) {
-  register(username: $username, password: $password) {
+    mutation Register($options: RegisterInput!) {
+  register(options: $options) {
     errors {
       field
       message

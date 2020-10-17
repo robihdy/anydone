@@ -12,6 +12,8 @@ import { User } from '../entities/User';
 import argon2 from 'argon2';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { COOKIE_NAME } from '../constants';
+import { RegisterInput } from './RegisterInput';
+import { validateRegister } from '../utils/validateRegister';
 
 @ObjectType()
 class FieldError {
@@ -34,33 +36,15 @@ class UserResponse {
 export class UserResolver {
   @Mutation(() => UserResponse)
   async register(
-    @Arg('username') username: string,
-    @Arg('password') password: string,
+    @Arg('options') options: RegisterInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    if (username.length <= 2) {
-      return {
-        errors: [
-          {
-            field: 'username',
-            message: 'length must be greater than 2',
-          },
-        ],
-      };
+    const errors = validateRegister(options);
+    if (errors) {
+      return { errors };
     }
 
-    if (password.length <= 2) {
-      return {
-        errors: [
-          {
-            field: 'password',
-            message: 'length must be greater than 2',
-          },
-        ],
-      };
-    }
-
-    const hashedPassword = await argon2.hash(password);
+    const hashedPassword = await argon2.hash(options.password);
 
     let user;
     try {
@@ -68,7 +52,7 @@ export class UserResolver {
         .createQueryBuilder(User)
         .getKnexQuery()
         .insert({
-          username,
+          email: options.email,
           password: hashedPassword,
           created_at: new Date(),
           updated_at: new Date(),
@@ -80,8 +64,8 @@ export class UserResolver {
         return {
           errors: [
             {
-              field: 'username',
-              message: 'username already taken',
+              field: 'email',
+              message: 'email already taken',
             },
           ],
         };
@@ -95,17 +79,17 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async login(
-    @Arg('username') username: string,
+    @Arg('email') email: string,
     @Arg('password') password: string,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    const user = await em.findOne(User, { username: username });
+    const user = await em.findOne(User, { email: email });
     if (!user) {
       return {
         errors: [
           {
-            field: 'username',
-            message: "that username doesn't exist",
+            field: 'email',
+            message: "that email doesn't exist",
           },
         ],
       };
