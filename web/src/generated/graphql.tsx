@@ -15,22 +15,22 @@ export type Scalars = {
 export type Query = {
   __typename?: 'Query';
   hello: Scalars['String'];
-  questions: Array<Question>;
-  question?: Maybe<Question>;
+  recipes: Array<Recipe>;
+  recipe?: Maybe<Recipe>;
   me?: Maybe<User>;
 };
 
 
-export type QueryQuestionArgs = {
+export type QueryRecipeArgs = {
   id: Scalars['Float'];
 };
 
-export type Question = {
-  __typename?: 'Question';
+export type Recipe = {
+  __typename?: 'Recipe';
   id: Scalars['Float'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
-  description: Scalars['String'];
+  title: Scalars['String'];
 };
 
 export type User = {
@@ -43,27 +43,27 @@ export type User = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createQuestion: Question;
-  updateQuestion?: Maybe<Question>;
-  deleteQuestion: Scalars['Boolean'];
+  createRecipe: Recipe;
+  updateRecipe?: Maybe<Recipe>;
+  deleteRecipe: Scalars['Boolean'];
   register: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
 };
 
 
-export type MutationCreateQuestionArgs = {
-  description: Scalars['String'];
+export type MutationCreateRecipeArgs = {
+  title: Scalars['String'];
 };
 
 
-export type MutationUpdateQuestionArgs = {
-  description?: Maybe<Scalars['String']>;
+export type MutationUpdateRecipeArgs = {
+  title?: Maybe<Scalars['String']>;
   id: Scalars['Float'];
 };
 
 
-export type MutationDeleteQuestionArgs = {
+export type MutationDeleteRecipeArgs = {
   id: Scalars['Float'];
 };
 
@@ -155,14 +155,14 @@ export type MeQuery = (
   )> }
 );
 
-export type QuestionsQueryVariables = Exact<{ [key: string]: never; }>;
+export type RecipesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type QuestionsQuery = (
+export type RecipesQuery = (
   { __typename?: 'Query' }
-  & { questions: Array<(
-    { __typename?: 'Question' }
-    & Pick<Question, 'id' | 'createdAt' | 'updatedAt' | 'description'>
+  & { recipes: Array<(
+    { __typename?: 'Recipe' }
+    & Pick<Recipe, 'id' | 'createdAt' | 'updatedAt' | 'title'>
   )> }
 );
 
@@ -226,17 +226,17 @@ export const MeDocument = gql`
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
-export const QuestionsDocument = gql`
-    query Questions {
-  questions {
+export const RecipesDocument = gql`
+    query Recipes {
+  recipes {
     id
     createdAt
     updatedAt
-    description
+    title
   }
 }
     `;
 
-export function useQuestionsQuery(options: Omit<Urql.UseQueryArgs<QuestionsQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<QuestionsQuery>({ query: QuestionsDocument, ...options });
+export function useRecipesQuery(options: Omit<Urql.UseQueryArgs<RecipesQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<RecipesQuery>({ query: RecipesDocument, ...options });
 };

@@ -3,7 +3,7 @@ import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Entity()
-export class Question {
+export class Recipe {
   @Field()
   @PrimaryKey()
   id!: number;
@@ -18,5 +18,5 @@ export class Question {
 
   @Field()
   @Property({ type: 'text' })
-  description!: string;
+  title!: string;
 }

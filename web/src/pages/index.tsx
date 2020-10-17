@@ -1,10 +1,10 @@
 import { NavBar } from '../components/NavBar';
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../utils/createUrqlClient';
-import { useQuestionsQuery } from '../generated/graphql';
+import { useRecipesQuery } from '../generated/graphql';
 
 const Index = () => {
-  const [{ data }] = useQuestionsQuery();
+  const [{ data }] = useRecipesQuery();
   return (
     <>
       <NavBar />
@@ -13,7 +13,7 @@ const Index = () => {
       {!data ? (
         <div>loading...</div>
       ) : (
-        data.questions.map((q) => <div key={q.id}>{q.description}</div>)
+        data.recipes.map((q) => <div key={q.id}>{q.title}</div>)
       )}
     </>
   );

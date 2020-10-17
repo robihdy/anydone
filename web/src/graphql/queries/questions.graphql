@@ -1,8 +1,0 @@
-query Questions {
-  questions {
-    id
-    createdAt
-    updatedAt
-    description
-  }
-}
