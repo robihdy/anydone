@@ -1,8 +1,7 @@
 mutation Register($options: RegisterInput!) {
   register(options: $options) {
     errors {
-      field
-      message
+      ...ErrorData
     }
     user {
       ...UserData
