@@ -1,52 +1,42 @@
 import { Task } from '../entities/Task';
-import { MyContext } from '../types';
-import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Mutation, Query, Resolver } from 'type-graphql';
 
 @Resolver()
 export class TaskResolver {
   @Query(() => [Task])
-  tasks(@Ctx() { em }: MyContext): Promise<Task[]> {
-    return em.find(Task, {});
+  tasks(): Promise<Task[]> {
+    return Task.find();
   }
 
   @Query(() => Task, { nullable: true })
-  task(@Arg('id') id: number, @Ctx() { em }: MyContext): Promise<Task | null> {
-    return em.findOne(Task, { id });
+  task(@Arg('id') id: number): Promise<Task | undefined> {
+    return Task.findOne(id);
   }
 
   @Mutation(() => Task)
-  async createTask(
-    @Arg('title') title: string,
-    @Ctx() { em }: MyContext
-  ): Promise<Task> {
-    const task = em.create(Task, { title });
-    await em.persistAndFlush(task);
-    return task;
+  async createTask(@Arg('title') title: string): Promise<Task> {
+    return Task.create({ title }).save();
   }
 
   @Mutation(() => Task, { nullable: true })
   async updateTask(
     @Arg('id') id: number,
-    @Arg('title', () => String, { nullable: true }) title: string,
-    @Ctx() { em }: MyContext
+    @Arg('title', () => String, { nullable: true }) title: string
   ): Promise<Task | null> {
-    const task = await em.findOne(Task, { id });
+    const task = await Task.findOne(id);
     if (!task) {
       return null;
     }
     if (typeof title !== 'undefined') {
       task.title = title;
-      await em.persistAndFlush(task);
+      await Task.update({ id }, { title });
     }
     return task;
   }
 
   @Mutation(() => Boolean)
-  async deleteTask(
-    @Arg('id') id: number,
-    @Ctx() { em }: MyContext
-  ): Promise<boolean> {
-    await em.nativeDelete(Task, { id });
+  async deleteTask(@Arg('id') id: number): Promise<boolean> {
+    await Task.delete(id);
     return true;
   }
 }
