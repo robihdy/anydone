@@ -1,5 +1,5 @@
-query Recipes {
-  recipes {
+query Tasks {
+  tasks {
     id
     createdAt
     updatedAt

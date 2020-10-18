@@ -1,5 +1,5 @@
 import { __prod__ } from './constants';
-import { Recipe } from './entities/Recipe';
+import { Task } from './entities/Task';
 import { MikroORM } from '@mikro-orm/core';
 import path from 'path';
 import { User } from './entities/User';
@@ -9,8 +9,8 @@ export default {
     path: path.join(__dirname, './migrations'),
     pattern: /^[\w-]+\d+\.[tj]s$/,
   },
-  entities: [Recipe, User],
-  dbName: 'idcooker',
+  entities: [Task, User],
+  dbName: 'anydone',
   user: 'robihid',
   password: 'ghj123',
   type: 'postgresql',

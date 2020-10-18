@@ -15,18 +15,18 @@ export type Scalars = {
 export type Query = {
   __typename?: 'Query';
   hello: Scalars['String'];
-  recipes: Array<Recipe>;
-  recipe?: Maybe<Recipe>;
+  tasks: Array<Task>;
+  task?: Maybe<Task>;
   me?: Maybe<User>;
 };
 
 
-export type QueryRecipeArgs = {
+export type QueryTaskArgs = {
   id: Scalars['Float'];
 };
 
-export type Recipe = {
-  __typename?: 'Recipe';
+export type Task = {
+  __typename?: 'Task';
   id: Scalars['Float'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
@@ -43,9 +43,9 @@ export type User = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createRecipe: Recipe;
-  updateRecipe?: Maybe<Recipe>;
-  deleteRecipe: Scalars['Boolean'];
+  createTask: Task;
+  updateTask?: Maybe<Task>;
+  deleteTask: Scalars['Boolean'];
   register: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
@@ -54,18 +54,18 @@ export type Mutation = {
 };
 
 
-export type MutationCreateRecipeArgs = {
+export type MutationCreateTaskArgs = {
   title: Scalars['String'];
 };
 
 
-export type MutationUpdateRecipeArgs = {
+export type MutationUpdateTaskArgs = {
   title?: Maybe<Scalars['String']>;
   id: Scalars['Float'];
 };
 
 
-export type MutationDeleteRecipeArgs = {
+export type MutationDeleteTaskArgs = {
   id: Scalars['Float'];
 };
 
@@ -206,14 +206,14 @@ export type MeQuery = (
   )> }
 );
 
-export type RecipesQueryVariables = Exact<{ [key: string]: never; }>;
+export type TasksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type RecipesQuery = (
+export type TasksQuery = (
   { __typename?: 'Query' }
-  & { recipes: Array<(
-    { __typename?: 'Recipe' }
-    & Pick<Recipe, 'id' | 'createdAt' | 'updatedAt' | 'title'>
+  & { tasks: Array<(
+    { __typename?: 'Task' }
+    & Pick<Task, 'id' | 'createdAt' | 'updatedAt' | 'title'>
   )> }
 );
 
@@ -309,9 +309,9 @@ export const MeDocument = gql`
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
-export const RecipesDocument = gql`
-    query Recipes {
-  recipes {
+export const TasksDocument = gql`
+    query Tasks {
+  tasks {
     id
     createdAt
     updatedAt
@@ -320,6 +320,6 @@ export const RecipesDocument = gql`
 }
     `;
 
-export function useRecipesQuery(options: Omit<Urql.UseQueryArgs<RecipesQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<RecipesQuery>({ query: RecipesDocument, ...options });
+export function useTasksQuery(options: Omit<Urql.UseQueryArgs<TasksQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<TasksQuery>({ query: TasksDocument, ...options });
 };

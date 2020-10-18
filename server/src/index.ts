@@ -6,7 +6,7 @@ import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { HelloResolver } from './resolvers/hello';
-import { RecipeResolver } from './resolvers/recipe';
+import { TaskResolver } from './resolvers/task';
 import { UserResolver } from './resolvers/user';
 import Redis from 'ioredis';
 import session from 'express-session';
@@ -50,7 +50,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, RecipeResolver, UserResolver],
+      resolvers: [HelloResolver, TaskResolver, UserResolver],
       validate: false,
     }),
     context: ({ req, res }): MyContext =>
