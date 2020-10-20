@@ -1,5 +1,26 @@
 import { Task } from '../entities/Task';
-import { Arg, Mutation, Query, Resolver } from 'type-graphql';
+import {
+  Arg,
+  Ctx,
+  Field,
+  InputType,
+  Mutation,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from 'type-graphql';
+import { MyContext } from 'src/types';
+import { isAuthenticated } from '../middleware/isAuthenticated';
+
+@InputType()
+class TaskInput {
+  @Field()
+  title: string;
+  @Field()
+  description: string;
+  @Field()
+  pomodoro: number;
+}
 
 @Resolver()
 export class TaskResolver {
@@ -14,8 +35,15 @@ export class TaskResolver {
   }
 
   @Mutation(() => Task)
-  async createTask(@Arg('title') title: string): Promise<Task> {
-    return Task.create({ title }).save();
+  @UseMiddleware(isAuthenticated)
+  async createTask(
+    @Arg('input') input: TaskInput,
+    @Ctx() { req }: MyContext
+  ): Promise<Task> {
+    return Task.create({
+      ...input,
+      creatorId: req.session.userId,
+    }).save();
   }
 
   @Mutation(() => Task, { nullable: true })
