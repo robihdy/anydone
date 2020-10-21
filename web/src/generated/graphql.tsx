@@ -146,6 +146,19 @@ export type ChangePasswordMutation = (
   ) }
 );
 
+export type CreateEventMutationVariables = Exact<{
+  input: EventInput;
+}>;
+
+
+export type CreateEventMutation = (
+  { __typename?: 'Mutation' }
+  & { createEvent: (
+    { __typename?: 'Event' }
+    & Pick<Event, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'description' | 'code' | 'creatorId'>
+  ) }
+);
+
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
 }>;
@@ -203,17 +216,6 @@ export type RegisterMutation = (
   ) }
 );
 
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type MeQuery = (
-  { __typename?: 'Query' }
-  & { me?: Maybe<(
-    { __typename?: 'User' }
-    & UserDataFragment
-  )> }
-);
-
 export type EventsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -222,6 +224,17 @@ export type EventsQuery = (
   & { events: Array<(
     { __typename?: 'Event' }
     & Pick<Event, 'id' | 'createdAt' | 'updatedAt' | 'title'>
+  )> }
+);
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = (
+  { __typename?: 'Query' }
+  & { me?: Maybe<(
+    { __typename?: 'User' }
+    & UserDataFragment
   )> }
 );
 
@@ -253,6 +266,23 @@ ${UserDataFragmentDoc}`;
 
 export function useChangePasswordMutation() {
   return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
+};
+export const CreateEventDocument = gql`
+    mutation CreateEvent($input: EventInput!) {
+  createEvent(input: $input) {
+    id
+    createdAt
+    updatedAt
+    title
+    description
+    code
+    creatorId
+  }
+}
+    `;
+
+export function useCreateEventMutation() {
+  return Urql.useMutation<CreateEventMutation, CreateEventMutationVariables>(CreateEventDocument);
 };
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
@@ -306,17 +336,6 @@ ${UserDataFragmentDoc}`;
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
-export const MeDocument = gql`
-    query Me {
-  me {
-    ...UserData
-  }
-}
-    ${UserDataFragmentDoc}`;
-
-export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
-};
 export const EventsDocument = gql`
     query Events {
   events {
@@ -330,4 +349,15 @@ export const EventsDocument = gql`
 
 export function useEventsQuery(options: Omit<Urql.UseQueryArgs<EventsQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<EventsQuery>({ query: EventsDocument, ...options });
+};
+export const MeDocument = gql`
+    query Me {
+  me {
+    ...UserData
+  }
+}
+    ${UserDataFragmentDoc}`;
+
+export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
