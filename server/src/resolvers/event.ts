@@ -4,6 +4,7 @@ import {
   Ctx,
   Field,
   InputType,
+  Int,
   Mutation,
   Query,
   Resolver,
@@ -11,6 +12,7 @@ import {
 } from 'type-graphql';
 import { MyContext } from 'src/types';
 import { isAuthenticated } from '../middleware/isAuthenticated';
+import { getConnection } from 'typeorm';
 
 @InputType()
 class EventInput {
@@ -23,8 +25,24 @@ class EventInput {
 @Resolver()
 export class EventResolver {
   @Query(() => [Event])
-  events(): Promise<Event[]> {
-    return Event.find();
+  async events(
+    @Arg('limit', () => Int) limit: number,
+    @Arg('cursor', () => String, { nullable: true }) cursor: string | null
+  ): Promise<Event[]> {
+    const realLimit = Math.min(50, limit);
+    const qb = getConnection()
+      .getRepository(Event)
+      .createQueryBuilder('e')
+      .orderBy('"createdAt"', 'DESC')
+      .take(realLimit);
+
+    if (cursor) {
+      qb.where('"createdAt" < :cursor', {
+        cursor: new Date(parseInt(cursor)),
+      });
+    }
+
+    return qb.getMany();
   }
 
   @Query(() => Event, { nullable: true })

@@ -21,6 +21,12 @@ export type Query = {
 };
 
 
+export type QueryEventsArgs = {
+  cursor?: Maybe<Scalars['String']>;
+  limit: Scalars['Int'];
+};
+
+
 export type QueryEventArgs = {
   id: Scalars['Float'];
 };
@@ -216,7 +222,10 @@ export type RegisterMutation = (
   ) }
 );
 
-export type EventsQueryVariables = Exact<{ [key: string]: never; }>;
+export type EventsQueryVariables = Exact<{
+  limit: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+}>;
 
 
 export type EventsQuery = (
@@ -337,8 +346,8 @@ export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
 export const EventsDocument = gql`
-    query Events {
-  events {
+    query Events($limit: Int!, $cursor: String) {
+  events(cursor: $cursor, limit: $limit) {
     id
     createdAt
     updatedAt

@@ -6,7 +6,11 @@ import { Layout } from '../components/Layout';
 import { Link } from '@chakra-ui/core';
 
 const Index = () => {
-  const [{ data }] = useEventsQuery();
+  const [{ data }] = useEventsQuery({
+    variables: {
+      limit: 10,
+    },
+  });
   return (
     <Layout>
       <NextLink href="/create-event">

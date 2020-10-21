@@ -1,5 +1,5 @@
-query Events {
-  events {
+query Events($limit: Int!, $cursor: String) {
+  events(cursor: $cursor, limit: $limit) {
     id
     createdAt
     updatedAt
