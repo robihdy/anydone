@@ -12,7 +12,7 @@ import { User } from './User';
 
 @ObjectType()
 @Entity()
-export class Task extends BaseEntity {
+export class Event extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
   id!: number;
@@ -26,14 +26,14 @@ export class Task extends BaseEntity {
   description!: string;
 
   @Field()
-  @Column({ type: 'int', default: 0 })
-  pomodoro!: number;
+  @Column({ unique: true })
+  code!: string;
 
   @Field()
   @Column()
   creatorId: number;
 
-  @ManyToOne(() => User, (user) => user.tasks)
+  @ManyToOne(() => User, (user) => user.events)
   creator: User;
 
   @Field(() => String)

@@ -1,13 +1,13 @@
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
-import { Task } from './entities/Task';
+import { Event } from './entities/Event';
 import { User } from './entities/User';
 import { COOKIE_NAME, __prod__ } from './constants';
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { HelloResolver } from './resolvers/hello';
-import { TaskResolver } from './resolvers/task';
+import { EventResolver } from './resolvers/event';
 import { UserResolver } from './resolvers/user';
 import Redis from 'ioredis';
 import session from 'express-session';
@@ -18,12 +18,12 @@ import cors from 'cors';
 const main = async () => {
   await createConnection({
     type: 'postgres',
-    database: 'anydone',
+    database: 'interask',
     username: 'robihid',
     password: 'ghj123',
     logging: true,
     synchronize: true,
-    entities: [User, Task],
+    entities: [User, Event],
   });
 
   const app = express();
@@ -58,7 +58,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, TaskResolver, UserResolver],
+      resolvers: [HelloResolver, EventResolver, UserResolver],
       validate: false,
     }),
     context: ({ req, res }): MyContext => <MyContext>{ req, res, redis },

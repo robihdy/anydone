@@ -15,37 +15,40 @@ export type Scalars = {
 export type Query = {
   __typename?: 'Query';
   hello: Scalars['String'];
-  tasks: Array<Task>;
-  task?: Maybe<Task>;
+  events: Array<Event>;
+  event?: Maybe<Event>;
   me?: Maybe<User>;
 };
 
 
-export type QueryTaskArgs = {
+export type QueryEventArgs = {
   id: Scalars['Float'];
 };
 
-export type Task = {
-  __typename?: 'Task';
+export type Event = {
+  __typename?: 'Event';
   id: Scalars['Float'];
+  title: Scalars['String'];
+  description: Scalars['String'];
+  code: Scalars['String'];
+  creatorId: Scalars['Float'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
-  title: Scalars['String'];
 };
 
 export type User = {
   __typename?: 'User';
   id: Scalars['Float'];
+  email: Scalars['String'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
-  email: Scalars['String'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createTask: Task;
-  updateTask?: Maybe<Task>;
-  deleteTask: Scalars['Boolean'];
+  createEvent: Event;
+  updateEvent?: Maybe<Event>;
+  deleteEvent: Scalars['Boolean'];
   register: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
@@ -54,18 +57,18 @@ export type Mutation = {
 };
 
 
-export type MutationCreateTaskArgs = {
-  title: Scalars['String'];
+export type MutationCreateEventArgs = {
+  input: EventInput;
 };
 
 
-export type MutationUpdateTaskArgs = {
+export type MutationUpdateEventArgs = {
   title?: Maybe<Scalars['String']>;
   id: Scalars['Float'];
 };
 
 
-export type MutationDeleteTaskArgs = {
+export type MutationDeleteEventArgs = {
   id: Scalars['Float'];
 };
 
@@ -89,6 +92,11 @@ export type MutationForgotPasswordArgs = {
 export type MutationChangePasswordArgs = {
   newPassword: Scalars['String'];
   token: Scalars['String'];
+};
+
+export type EventInput = {
+  title: Scalars['String'];
+  description: Scalars['String'];
 };
 
 export type UserResponse = {
@@ -206,14 +214,14 @@ export type MeQuery = (
   )> }
 );
 
-export type TasksQueryVariables = Exact<{ [key: string]: never; }>;
+export type EventsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type TasksQuery = (
+export type EventsQuery = (
   { __typename?: 'Query' }
-  & { tasks: Array<(
-    { __typename?: 'Task' }
-    & Pick<Task, 'id' | 'createdAt' | 'updatedAt' | 'title'>
+  & { events: Array<(
+    { __typename?: 'Event' }
+    & Pick<Event, 'id' | 'createdAt' | 'updatedAt' | 'title'>
   )> }
 );
 
@@ -309,9 +317,9 @@ export const MeDocument = gql`
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
-export const TasksDocument = gql`
-    query Tasks {
-  tasks {
+export const EventsDocument = gql`
+    query Events {
+  events {
     id
     createdAt
     updatedAt
@@ -320,6 +328,6 @@ export const TasksDocument = gql`
 }
     `;
 
-export function useTasksQuery(options: Omit<Urql.UseQueryArgs<TasksQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<TasksQuery>({ query: TasksDocument, ...options });
+export function useEventsQuery(options: Omit<Urql.UseQueryArgs<EventsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<EventsQuery>({ query: EventsDocument, ...options });
 };

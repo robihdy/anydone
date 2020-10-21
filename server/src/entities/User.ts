@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ObjectType, Field } from 'type-graphql';
-import { Task } from './Task';
+import { Event } from './Event';
 
 @ObjectType()
 @Entity()
@@ -24,8 +24,8 @@ export class User extends BaseEntity {
   @Column()
   password!: string;
 
-  @OneToMany(() => Task, (task) => task.creator)
-  tasks: Task[];
+  @OneToMany(() => Event, (event) => event.creator)
+  events: Event[];
 
   @Field(() => String)
   @CreateDateColumn()
