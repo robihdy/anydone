@@ -35,6 +35,7 @@ export class Event extends BaseEntity {
   @Column()
   creatorId: number;
 
+  @Field()
   @ManyToOne(() => User, (user) => user.events)
   creator: User;
 

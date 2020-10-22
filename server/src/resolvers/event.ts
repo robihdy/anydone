@@ -30,19 +30,33 @@ export class EventResolver {
     @Arg('cursor', () => String, { nullable: true }) cursor: string | null
   ): Promise<Event[]> {
     const realLimit = Math.min(50, limit);
-    const qb = getConnection()
-      .getRepository(Event)
-      .createQueryBuilder('e')
-      .orderBy('"createdAt"', 'DESC')
-      .take(realLimit);
+    const sqlParams: any[] = [realLimit];
 
     if (cursor) {
-      qb.where('"createdAt" < :cursor', {
-        cursor: new Date(parseInt(cursor)),
-      });
+      sqlParams.push(new Date(parseInt(cursor)));
     }
 
-    return qb.getMany();
+    const events = await getConnection().query(
+      `
+    select e.*,
+    json_build_object(
+      'id', u.id,
+      'email', u.email,
+      'createdAt', u."createdAt",
+      'updatedAt', u."updatedAt"
+      ) creator
+    from event e
+    inner join public.user u on u.id = e."creatorId"
+    ${cursor ? `where e."createdAt" < $2` : ''}
+    order by e."createdAt" DESC
+    limit $1
+    `,
+      sqlParams
+    );
+
+    console.log(events);
+
+    return events;
   }
 
   @Query(() => Event, { nullable: true })
