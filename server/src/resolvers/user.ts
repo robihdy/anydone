@@ -6,6 +6,8 @@ import {
   ObjectType,
   Field,
   Query,
+  FieldResolver,
+  Root,
 } from 'type-graphql';
 import { MyContext } from '../types';
 import { User } from '../entities/User';
@@ -36,6 +38,15 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @FieldResolver(() => String)
+  email(@Root() user: User, @Ctx() { req }: MyContext) {
+    if (req.session.userId === user.id) {
+      return user.email;
+    }
+
+    return '';
+  }
+
   @Mutation(() => UserResponse)
   async register(
     @Arg('options') options: RegisterInput,
