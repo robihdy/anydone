@@ -5,7 +5,12 @@ import NextLink from 'next/link';
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../../utils/createUrqlClient';
 import { Layout } from '../../components/Layout';
-import { useQuestionsQuery } from '../../generated/graphql';
+import {
+  useCreateQuestionMutation,
+  useQuestionsQuery,
+} from '../../generated/graphql';
+import { Form, Formik } from 'formik';
+import { InputField } from '../../components/InputField';
 
 const Event: NextPage<{ id: string }> = ({ id }) => {
   const [variables, setVariables] = useState({
@@ -24,14 +29,54 @@ const Event: NextPage<{ id: string }> = ({ id }) => {
     return <div>you got query failed for some reason!</div>;
   }
 
+  const [, createQuestion] = useCreateQuestionMutation();
+
   return (
     <Layout>
       <Flex align="center">
         <Heading>Event Title</Heading>
-        <NextLink href="/create-question">
-          <Link ml="auto">Ask a Question</Link>
-        </NextLink>
       </Flex>
+      <br />
+      <Formik
+        initialValues={{
+          authorName: '',
+          description: '',
+        }}
+        onSubmit={async (values, { resetForm }) => {
+          const { error } = await createQuestion({
+            input: { ...values, eventId: parseInt(id) },
+          });
+          if (!error) {
+            resetForm({});
+          }
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <InputField
+              name="authorName"
+              placeholder="Your Name (optional)"
+              label="Your Name"
+            />
+            <Box mt={4}>
+              <InputField
+                textarea
+                name="description"
+                placeholder="Type your question"
+                label="Question"
+              />
+            </Box>
+            <Button
+              mt={4}
+              type="submit"
+              isLoading={isSubmitting}
+              variantColor="teal"
+            >
+              Send
+            </Button>
+          </Form>
+        )}
+      </Formik>
       <br />
       {!data && fetching ? (
         <div>loading...</div>
