@@ -18,7 +18,7 @@ export type Query = {
   events: Array<Event>;
   event?: Maybe<Event>;
   me?: Maybe<User>;
-  questions: Array<Question>;
+  questions: PaginatedQuestions;
   question?: Maybe<Question>;
 };
 
@@ -62,6 +62,12 @@ export type User = {
   email: Scalars['String'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
+};
+
+export type PaginatedQuestions = {
+  __typename?: 'PaginatedQuestions';
+  questions: Array<Question>;
+  hasMore: Scalars['Boolean'];
 };
 
 export type Question = {
@@ -319,10 +325,14 @@ export type QuestionsQueryVariables = Exact<{
 
 export type QuestionsQuery = (
   { __typename?: 'Query' }
-  & { questions: Array<(
-    { __typename?: 'Question' }
-    & Pick<Question, 'id' | 'authorName' | 'description' | 'points' | 'createdAt' | 'updatedAt'>
-  )> }
+  & { questions: (
+    { __typename?: 'PaginatedQuestions' }
+    & Pick<PaginatedQuestions, 'hasMore'>
+    & { questions: Array<(
+      { __typename?: 'Question' }
+      & Pick<Question, 'id' | 'authorName' | 'description' | 'points' | 'createdAt' | 'updatedAt'>
+    )> }
+  ) }
 );
 
 export const ErrorDataFragmentDoc = gql`
@@ -467,12 +477,15 @@ export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'q
 export const QuestionsDocument = gql`
     query Questions($eventId: Int!, $limit: Int!, $cursor: String) {
   questions(eventId: $eventId, cursor: $cursor, limit: $limit) {
-    id
-    authorName
-    description
-    points
-    createdAt
-    updatedAt
+    hasMore
+    questions {
+      id
+      authorName
+      description
+      points
+      createdAt
+      updatedAt
+    }
   }
 }
     `;

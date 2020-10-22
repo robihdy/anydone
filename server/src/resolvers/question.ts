@@ -5,6 +5,7 @@ import {
   InputType,
   Int,
   Mutation,
+  ObjectType,
   Query,
   Resolver,
 } from 'type-graphql';
@@ -20,21 +21,30 @@ class QuestionInput {
   description: string;
 }
 
+@ObjectType()
+class PaginatedQuestions {
+  @Field(() => [Question])
+  questions: Question[];
+  @Field()
+  hasMore: boolean;
+}
+
 @Resolver()
 export class QuestionResolver {
-  @Query(() => [Question])
+  @Query(() => PaginatedQuestions)
   async questions(
     @Arg('eventId', () => Int) eventId: number,
     @Arg('limit', () => Int) limit: number,
     @Arg('cursor', () => String, { nullable: true }) cursor: string | null
-  ): Promise<Question[]> {
+  ): Promise<PaginatedQuestions> {
     const realLimit = Math.min(50, limit);
+    const realLimitPlusOne = realLimit + 1;
     const qb = getConnection()
       .getRepository(Question)
       .createQueryBuilder('q')
       .where('"eventId" = :eventId', { eventId })
       .orderBy('"createdAt"', 'DESC')
-      .take(realLimit);
+      .take(realLimitPlusOne);
 
     if (cursor) {
       qb.andWhere('"createdAt" < :cursor', {
@@ -42,7 +52,12 @@ export class QuestionResolver {
       });
     }
 
-    return qb.getMany();
+    const questions = await qb.getMany();
+
+    return {
+      questions: questions.slice(0, realLimit),
+      hasMore: questions.length === realLimitPlusOne,
+    };
   }
 
   @Query(() => Question, { nullable: true })
