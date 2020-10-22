@@ -93,4 +93,23 @@ export class QuestionResolver {
     await Question.delete(id);
     return true;
   }
+
+  @Mutation(() => Boolean)
+  async vote(
+    @Arg('questionId', () => Int) questionId: number,
+    @Arg('value', () => Int) value: number
+  ) {
+    if (value !== 1 && value !== -1) {
+      return false;
+    }
+
+    await getConnection().query(
+      `
+    update question
+    set points = points + ${value}
+    where id = ${questionId};
+    `
+    );
+    return true;
+  }
 }

@@ -54,8 +54,6 @@ export class EventResolver {
       sqlParams
     );
 
-    console.log(events);
-
     return events;
   }
 
