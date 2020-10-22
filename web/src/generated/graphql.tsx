@@ -18,6 +18,8 @@ export type Query = {
   events: Array<Event>;
   event?: Maybe<Event>;
   me?: Maybe<User>;
+  questions: Array<Question>;
+  question?: Maybe<Question>;
 };
 
 
@@ -28,6 +30,18 @@ export type QueryEventsArgs = {
 
 
 export type QueryEventArgs = {
+  id: Scalars['Float'];
+};
+
+
+export type QueryQuestionsArgs = {
+  cursor?: Maybe<Scalars['String']>;
+  limit: Scalars['Int'];
+  eventId: Scalars['Int'];
+};
+
+
+export type QueryQuestionArgs = {
   id: Scalars['Float'];
 };
 
@@ -50,6 +64,17 @@ export type User = {
   updatedAt: Scalars['String'];
 };
 
+export type Question = {
+  __typename?: 'Question';
+  id: Scalars['Float'];
+  authorName: Scalars['String'];
+  description: Scalars['String'];
+  points: Scalars['Float'];
+  eventId: Scalars['Float'];
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createEvent: Event;
@@ -60,6 +85,9 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
   changePassword: UserResponse;
+  createQuestion: Question;
+  updateQuestion?: Maybe<Question>;
+  deleteQuestion: Scalars['Boolean'];
 };
 
 
@@ -100,6 +128,22 @@ export type MutationChangePasswordArgs = {
   token: Scalars['String'];
 };
 
+
+export type MutationCreateQuestionArgs = {
+  input: QuestionInput;
+};
+
+
+export type MutationUpdateQuestionArgs = {
+  description?: Maybe<Scalars['String']>;
+  id: Scalars['Float'];
+};
+
+
+export type MutationDeleteQuestionArgs = {
+  id: Scalars['Float'];
+};
+
 export type EventInput = {
   title: Scalars['String'];
   description: Scalars['String'];
@@ -120,6 +164,12 @@ export type FieldError = {
 export type RegisterInput = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+export type QuestionInput = {
+  eventId: Scalars['Float'];
+  authorName: Scalars['String'];
+  description: Scalars['String'];
 };
 
 export type ErrorDataFragment = (
@@ -162,6 +212,19 @@ export type CreateEventMutation = (
   & { createEvent: (
     { __typename?: 'Event' }
     & Pick<Event, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'description' | 'code' | 'creatorId'>
+  ) }
+);
+
+export type CreateQuestionMutationVariables = Exact<{
+  input: QuestionInput;
+}>;
+
+
+export type CreateQuestionMutation = (
+  { __typename?: 'Mutation' }
+  & { createQuestion: (
+    { __typename?: 'Question' }
+    & Pick<Question, 'id' | 'createdAt' | 'updatedAt' | 'authorName' | 'description' | 'points'>
   ) }
 );
 
@@ -247,6 +310,21 @@ export type MeQuery = (
   )> }
 );
 
+export type QuestionsQueryVariables = Exact<{
+  eventId: Scalars['Int'];
+  limit: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+}>;
+
+
+export type QuestionsQuery = (
+  { __typename?: 'Query' }
+  & { questions: Array<(
+    { __typename?: 'Question' }
+    & Pick<Question, 'id' | 'authorName' | 'description' | 'points' | 'createdAt' | 'updatedAt'>
+  )> }
+);
+
 export const ErrorDataFragmentDoc = gql`
     fragment ErrorData on FieldError {
   field
@@ -292,6 +370,22 @@ export const CreateEventDocument = gql`
 
 export function useCreateEventMutation() {
   return Urql.useMutation<CreateEventMutation, CreateEventMutationVariables>(CreateEventDocument);
+};
+export const CreateQuestionDocument = gql`
+    mutation CreateQuestion($input: QuestionInput!) {
+  createQuestion(input: $input) {
+    id
+    createdAt
+    updatedAt
+    authorName
+    description
+    points
+  }
+}
+    `;
+
+export function useCreateQuestionMutation() {
+  return Urql.useMutation<CreateQuestionMutation, CreateQuestionMutationVariables>(CreateQuestionDocument);
 };
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
@@ -369,4 +463,20 @@ export const MeDocument = gql`
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const QuestionsDocument = gql`
+    query Questions($eventId: Int!, $limit: Int!, $cursor: String) {
+  questions(eventId: $eventId, cursor: $cursor, limit: $limit) {
+    id
+    authorName
+    description
+    points
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export function useQuestionsQuery(options: Omit<Urql.UseQueryArgs<QuestionsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<QuestionsQuery>({ query: QuestionsDocument, ...options });
 };

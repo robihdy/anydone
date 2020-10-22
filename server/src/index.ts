@@ -14,6 +14,8 @@ import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { MyContext } from './types';
 import cors from 'cors';
+import { Question } from './entities/Question';
+import { QuestionResolver } from './resolvers/question';
 
 const main = async () => {
   await createConnection({
@@ -23,7 +25,7 @@ const main = async () => {
     password: 'ghj123',
     logging: true,
     synchronize: true,
-    entities: [User, Event],
+    entities: [User, Event, Question],
   });
 
   const app = express();
@@ -58,7 +60,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, EventResolver, UserResolver],
+      resolvers: [HelloResolver, EventResolver, UserResolver, QuestionResolver],
       validate: false,
     }),
     context: ({ req, res }): MyContext => <MyContext>{ req, res, redis },

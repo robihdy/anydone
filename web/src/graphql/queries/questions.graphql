@@ -1,0 +1,10 @@
+query Questions($eventId: Int!, $limit: Int!, $cursor: String) {
+  questions(eventId: $eventId, cursor: $cursor, limit: $limit) {
+    id
+    authorName
+    description
+    points
+    createdAt
+    updatedAt
+  }
+}

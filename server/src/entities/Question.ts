@@ -4,42 +4,37 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Field, ObjectType } from 'type-graphql';
-import { User } from './User';
-import { Question } from './Question';
+import { Event } from './Event';
 
 @ObjectType()
 @Entity()
-export class Event extends BaseEntity {
+export class Question extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
   id!: number;
 
   @Field()
   @Column()
-  title!: string;
+  authorName!: string;
 
   @Field()
   @Column()
   description!: string;
 
   @Field()
-  @Column({ unique: true })
-  code!: string;
+  @Column({ type: 'int', default: 0 })
+  points!: number;
 
   @Field()
   @Column()
-  creatorId: number;
+  eventId: number;
 
-  @ManyToOne(() => User, (user) => user.events)
-  creator: User;
-
-  @OneToMany(() => Question, (question) => question.event)
-  questions: Question[];
+  @ManyToOne(() => Event, (event) => event.questions)
+  event: Event;
 
   @Field(() => String)
   @CreateDateColumn()

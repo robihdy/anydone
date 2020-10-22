@@ -1,0 +1,10 @@
+mutation CreateQuestion($input: QuestionInput!) {
+  createQuestion(input: $input) {
+    id
+    createdAt
+    updatedAt
+    authorName
+    description
+    points
+  }
+}
