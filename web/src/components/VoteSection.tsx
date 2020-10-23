@@ -17,8 +17,7 @@ export const VoteSection: React.FC<VoteSectionProps> = ({ question }) => {
   return (
     <Flex direction="column" justifyContent="center" alignItems="center" mr={4}>
       <IconButton
-        variant="outline"
-        variantColor="red"
+        variantColor={currentVote === 'voted' ? 'green' : undefined}
         onClick={async () => {
           setLoadingState('vote-loading');
           await vote({
@@ -31,7 +30,6 @@ export const VoteSection: React.FC<VoteSectionProps> = ({ question }) => {
         isLoading={loadingState === 'vote-loading'}
         aria-label="upvote question"
         icon="chevron-up"
-        isActive={currentVote === 'voted'}
       />
       {question.points}
     </Flex>
