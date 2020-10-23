@@ -12,9 +12,11 @@ import {
   MeDocument,
   LoginMutation,
   RegisterMutation,
+  VoteMutationVariables,
 } from '../generated/graphql';
 import { betterUpdateQuery } from './betterUpdateQuery';
 import Router from 'next/router';
+import gql from 'graphql-tag';
 
 const errorExchange: Exchange = ({ forward }) => (ops$) => {
   return pipe(
@@ -31,7 +33,6 @@ const cursorPagination = (): Resolver => {
   return (_parent, fieldArgs, cache, info) => {
     const { parentKey: entityKey, fieldName } = info;
     const allFields = cache.inspectFields(entityKey);
-    console.log('allFields: ', allFields);
     const fieldInfos = allFields.filter((info) => info.fieldName === fieldName);
     const size = fieldInfos.length;
     if (size === 0) {
@@ -82,6 +83,30 @@ export const createUrqlClient = (ssrExchange: any) => ({
       },
       updates: {
         Mutation: {
+          vote: (_result, args, cache, info) => {
+            const { questionId, value } = args as VoteMutationVariables;
+            const data = cache.readFragment(
+              gql`
+                fragment _ on Question {
+                  id
+                  points
+                }
+              `,
+              { id: questionId } as any
+            );
+
+            if (data) {
+              const newPoints = (data.points as number) + value;
+              cache.writeFragment(
+                gql`
+                  fragment __ on Question {
+                    points
+                  }
+                `,
+                { id: questionId, points: newPoints } as any
+              );
+            }
+          },
           createQuestion: (_result, args, cache, info) => {
             const allFields = cache.inspectFields('Query');
             const fieldInfos = allFields.filter(

@@ -11,6 +11,7 @@ import {
 } from '../../generated/graphql';
 import { Form, Formik } from 'formik';
 import { InputField } from '../../components/InputField';
+import { VoteSection } from '../../components/VoteSection';
 
 const Event: NextPage<{ id: string }> = ({ id }) => {
   const [variables, setVariables] = useState({
@@ -83,10 +84,13 @@ const Event: NextPage<{ id: string }> = ({ id }) => {
       ) : (
         <Stack spacing={8}>
           {data!.questions.questions.map((q) => (
-            <Box key={q.id} p={5} shadow="md" borderWidth="1px">
-              <Heading fontSize="xl">{q.authorName}</Heading>
-              <Text mt={4}>{q.description}</Text>
-            </Box>
+            <Flex key={q.id} p={5} shadow="md" borderWidth="1px">
+              <VoteSection question={q} />
+              <Box>
+                <Heading fontSize="xl">{q.authorName}</Heading>
+                <Text mt={4}>{q.description}</Text>
+              </Box>
+            </Flex>
           ))}
         </Stack>
       )}

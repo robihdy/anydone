@@ -52,6 +52,7 @@ export type Event = {
   description: Scalars['String'];
   code: Scalars['String'];
   creatorId: Scalars['Float'];
+  creator: User;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
 };
@@ -94,6 +95,7 @@ export type Mutation = {
   createQuestion: Question;
   updateQuestion?: Maybe<Question>;
   deleteQuestion: Scalars['Boolean'];
+  vote: Scalars['Boolean'];
 };
 
 
@@ -150,6 +152,12 @@ export type MutationDeleteQuestionArgs = {
   id: Scalars['Float'];
 };
 
+
+export type MutationVoteArgs = {
+  value: Scalars['Int'];
+  questionId: Scalars['Int'];
+};
+
 export type EventInput = {
   title: Scalars['String'];
   description: Scalars['String'];
@@ -181,6 +189,11 @@ export type QuestionInput = {
 export type ErrorDataFragment = (
   { __typename?: 'FieldError' }
   & Pick<FieldError, 'field' | 'message'>
+);
+
+export type QuestionSnippetFragment = (
+  { __typename?: 'Question' }
+  & Pick<Question, 'id' | 'authorName' | 'description' | 'points' | 'createdAt' | 'updatedAt'>
 );
 
 export type UserDataFragment = (
@@ -291,6 +304,17 @@ export type RegisterMutation = (
   ) }
 );
 
+export type VoteMutationVariables = Exact<{
+  value: Scalars['Int'];
+  questionId: Scalars['Int'];
+}>;
+
+
+export type VoteMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'vote'>
+);
+
 export type EventsQueryVariables = Exact<{
   limit: Scalars['Int'];
   cursor?: Maybe<Scalars['String']>;
@@ -330,7 +354,7 @@ export type QuestionsQuery = (
     & Pick<PaginatedQuestions, 'hasMore'>
     & { questions: Array<(
       { __typename?: 'Question' }
-      & Pick<Question, 'id' | 'authorName' | 'description' | 'points' | 'createdAt' | 'updatedAt'>
+      & QuestionSnippetFragment
     )> }
   ) }
 );
@@ -339,6 +363,16 @@ export const ErrorDataFragmentDoc = gql`
     fragment ErrorData on FieldError {
   field
   message
+}
+    `;
+export const QuestionSnippetFragmentDoc = gql`
+    fragment QuestionSnippet on Question {
+  id
+  authorName
+  description
+  points
+  createdAt
+  updatedAt
 }
     `;
 export const UserDataFragmentDoc = gql`
@@ -449,6 +483,15 @@ ${UserDataFragmentDoc}`;
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };
+export const VoteDocument = gql`
+    mutation Vote($value: Int!, $questionId: Int!) {
+  vote(value: $value, questionId: $questionId)
+}
+    `;
+
+export function useVoteMutation() {
+  return Urql.useMutation<VoteMutation, VoteMutationVariables>(VoteDocument);
+};
 export const EventsDocument = gql`
     query Events($limit: Int!, $cursor: String) {
   events(cursor: $cursor, limit: $limit) {
@@ -479,16 +522,11 @@ export const QuestionsDocument = gql`
   questions(eventId: $eventId, cursor: $cursor, limit: $limit) {
     hasMore
     questions {
-      id
-      authorName
-      description
-      points
-      createdAt
-      updatedAt
+      ...QuestionSnippet
     }
   }
 }
-    `;
+    ${QuestionSnippetFragmentDoc}`;
 
 export function useQuestionsQuery(options: Omit<Urql.UseQueryArgs<QuestionsQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<QuestionsQuery>({ query: QuestionsDocument, ...options });

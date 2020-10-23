@@ -1,0 +1,8 @@
+fragment QuestionSnippet on Question {
+  id
+  authorName
+  description
+  points
+  createdAt
+  updatedAt
+}

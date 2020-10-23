@@ -2,12 +2,7 @@ query Questions($eventId: Int!, $limit: Int!, $cursor: String) {
   questions(eventId: $eventId, cursor: $cursor, limit: $limit) {
     hasMore
     questions {
-      id
-      authorName
-      description
-      points
-      createdAt
-      updatedAt
+      ...QuestionSnippet
     }
   }
 }
