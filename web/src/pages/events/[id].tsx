@@ -20,8 +20,6 @@ const Event: NextPage<{ id: string }> = ({ id }) => {
     cursor: null as null | string,
   });
 
-  console.log(variables);
-
   const [{ data, fetching }] = useQuestionsQuery({
     variables,
   });
@@ -49,6 +47,11 @@ const Event: NextPage<{ id: string }> = ({ id }) => {
           });
           if (!error) {
             resetForm({});
+            setVariables({
+              eventId: parseInt(id),
+              limit: 10,
+              cursor: null as null | string,
+            });
           }
         }}
       >
