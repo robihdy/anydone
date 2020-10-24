@@ -89,7 +89,7 @@ export class QuestionResolver {
   }
 
   @Mutation(() => Boolean)
-  async deleteQuestion(@Arg('id') id: number): Promise<boolean> {
+  async deleteQuestion(@Arg('id', () => Int) id: number): Promise<boolean> {
     await Question.delete(id);
     return true;
   }

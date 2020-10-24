@@ -16,18 +16,19 @@ import { createUrqlClient } from '../../utils/createUrqlClient';
 import { Layout } from '../../components/Layout';
 import {
   useCreateQuestionMutation,
+  useDeleteQuestionMutation,
   useQuestionsQuery,
 } from '../../generated/graphql';
 import { Form, Formik } from 'formik';
 import { InputField } from '../../components/InputField';
 import { VoteSection } from '../../components/VoteSection';
-import { cookies } from '../../utils/cookies';
+import { cookies, setOptions } from '../../utils/cookies';
 import { v4 } from 'uuid';
 
 const Event: NextPage<{ id: string }> = ({ id }) => {
   const guestId = v4();
   if (!cookies.get('iask_guestId')) {
-    cookies.set('iask_guestId', guestId, { path: '/', maxAge: 1 * 60 * 60 });
+    cookies.set('iask_guestId', guestId, setOptions);
   }
 
   const [variables, setVariables] = useState({
@@ -45,6 +46,7 @@ const Event: NextPage<{ id: string }> = ({ id }) => {
   }
 
   const [, createQuestion] = useCreateQuestionMutation();
+  const [, deleteQuestion] = useDeleteQuestionMutation();
 
   return (
     <Layout>
@@ -70,7 +72,8 @@ const Event: NextPage<{ id: string }> = ({ id }) => {
             });
             cookies.set(
               `qauthor_${data?.createQuestion.id}`,
-              cookies.get('iask_guestId')
+              cookies.get('iask_guestId'),
+              setOptions
             );
           }
         }}
@@ -106,19 +109,33 @@ const Event: NextPage<{ id: string }> = ({ id }) => {
         <div>loading...</div>
       ) : (
         <Stack spacing={8}>
-          {data!.questions.questions.map((q) => (
-            <Flex key={q.id} p={5} shadow="md" borderWidth="1px">
-              <VoteSection question={q} />
-              <Box>
-                <Heading fontSize="xl">{q.authorName}</Heading>
-                <Flex align="center">
-                  <Text flex={1} mt={4}>
-                    {q.description}
-                  </Text>
-                </Flex>
-              </Box>
-            </Flex>
-          ))}
+          {data!.questions.questions.map((q) =>
+            !q ? null : (
+              <Flex key={q.id} p={5} shadow="md" borderWidth="1px">
+                <VoteSection question={q} />
+                <Box flex={1}>
+                  <Heading fontSize="xl">{q.authorName}</Heading>
+                  <Flex align="center">
+                    <Text flex={1} mt={4}>
+                      {q.description}
+                    </Text>
+                    {cookies.get(`qauthor_${q.id}`) ===
+                      cookies.get('iask_guestId') && (
+                      <IconButton
+                        ml="auto"
+                        variantColor="red"
+                        icon="delete"
+                        aria-label="Delete Post"
+                        onClick={() => {
+                          deleteQuestion({ id: q.id });
+                        }}
+                      />
+                    )}
+                  </Flex>
+                </Box>
+              </Flex>
+            )
+          )}
         </Stack>
       )}
       {data && data.questions.hasMore ? (

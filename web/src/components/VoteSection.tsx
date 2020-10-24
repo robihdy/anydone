@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Flex, IconButton } from '@chakra-ui/core';
 import { QuestionSnippetFragment, useVoteMutation } from '../generated/graphql';
-import { cookies } from '../utils/cookies';
+import { cookies, setOptions } from '../utils/cookies';
 
 interface VoteSectionProps {
   question: QuestionSnippetFragment;
@@ -36,7 +36,11 @@ export const VoteSection: React.FC<VoteSectionProps> = ({ question }) => {
           setLoadingState('not-loading');
           if (!isVoted) {
             setIsVoted(true);
-            cookies.set(`vote_${question.id}`, cookies.get('iask_guestId'));
+            cookies.set(
+              `vote_${question.id}`,
+              cookies.get('iask_guestId'),
+              setOptions
+            );
           } else if (getVoteStatus()) {
             setIsVoted(false);
             cookies.remove(`vote_${question.id}`);

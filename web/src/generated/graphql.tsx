@@ -149,7 +149,7 @@ export type MutationUpdateQuestionArgs = {
 
 
 export type MutationDeleteQuestionArgs = {
-  id: Scalars['Float'];
+  id: Scalars['Int'];
 };
 
 
@@ -245,6 +245,16 @@ export type CreateQuestionMutation = (
     { __typename?: 'Question' }
     & Pick<Question, 'id' | 'createdAt' | 'updatedAt' | 'authorName' | 'description' | 'points'>
   ) }
+);
+
+export type DeleteQuestionMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type DeleteQuestionMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteQuestion'>
 );
 
 export type ForgotPasswordMutationVariables = Exact<{
@@ -430,6 +440,15 @@ export const CreateQuestionDocument = gql`
 
 export function useCreateQuestionMutation() {
   return Urql.useMutation<CreateQuestionMutation, CreateQuestionMutationVariables>(CreateQuestionDocument);
+};
+export const DeleteQuestionDocument = gql`
+    mutation DeleteQuestion($id: Int!) {
+  deleteQuestion(id: $id)
+}
+    `;
+
+export function useDeleteQuestionMutation() {
+  return Urql.useMutation<DeleteQuestionMutation, DeleteQuestionMutationVariables>(DeleteQuestionDocument);
 };
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
