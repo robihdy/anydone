@@ -1,29 +1,27 @@
-import React, { useState } from 'react';
-import { NextPage } from 'next';
 import {
   Box,
   Button,
   Flex,
   Heading,
   IconButton,
-  Link,
   Stack,
   Text,
 } from '@chakra-ui/core';
-import NextLink from 'next/link';
+import { Form, Formik } from 'formik';
+import { NextPage } from 'next';
 import { withUrqlClient } from 'next-urql';
-import { createUrqlClient } from '../../utils/createUrqlClient';
+import React, { useState } from 'react';
+import { v4 } from 'uuid';
+import { InputField } from '../../components/InputField';
 import { Layout } from '../../components/Layout';
+import { VoteSection } from '../../components/VoteSection';
 import {
   useCreateQuestionMutation,
   useDeleteQuestionMutation,
   useQuestionsQuery,
 } from '../../generated/graphql';
-import { Form, Formik } from 'formik';
-import { InputField } from '../../components/InputField';
-import { VoteSection } from '../../components/VoteSection';
 import { cookies, setOptions } from '../../utils/cookies';
-import { v4 } from 'uuid';
+import { createUrqlClient } from '../../utils/createUrqlClient';
 
 const Event: NextPage<{ id: string }> = ({ id }) => {
   const guestId = v4();

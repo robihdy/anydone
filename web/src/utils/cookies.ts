@@ -6,3 +6,7 @@ export const setOptions = {
   maxAge: 1 * 60 * 60,
   path: '/',
 };
+
+export const removeOptions = {
+  path: '/',
+};

@@ -3,16 +3,19 @@ import {
   Arg,
   Ctx,
   Field,
+  FieldResolver,
   InputType,
   Int,
   Mutation,
   Query,
   Resolver,
+  Root,
   UseMiddleware,
 } from 'type-graphql';
 import { MyContext } from 'src/types';
 import { isAuthenticated } from '../middleware/isAuthenticated';
 import { getConnection } from 'typeorm';
+import { User } from '../entities/User';
 
 @InputType()
 class EventInput {
@@ -22,8 +25,13 @@ class EventInput {
   description: string;
 }
 
-@Resolver()
+@Resolver(Event)
 export class EventResolver {
+  @FieldResolver(() => User)
+  creator(@Root() post: Event, @Ctx() { userLoader }: MyContext) {
+    return userLoader.load(post.creatorId);
+  }
+
   @Query(() => [Event])
   async events(
     @Arg('limit', () => Int) limit: number,
@@ -38,15 +46,8 @@ export class EventResolver {
 
     const events = await getConnection().query(
       `
-    select e.*,
-    json_build_object(
-      'id', u.id,
-      'email', u.email,
-      'createdAt', u."createdAt",
-      'updatedAt', u."updatedAt"
-      ) creator
+    select e.*
     from event e
-    inner join public.user u on u.id = e."creatorId"
     ${cursor ? `where e."createdAt" < $2` : ''}
     order by e."createdAt" DESC
     limit $1
