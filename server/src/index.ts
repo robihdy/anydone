@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import 'dotenv-safe/config';
 import { createConnection } from 'typeorm';
 import { Event } from './entities/Event';
 import { User } from './entities/User';
@@ -21,9 +22,7 @@ import { createUserLoader } from './utils/createUserLoader';
 const main = async () => {
   await createConnection({
     type: 'postgres',
-    database: 'interask',
-    username: 'robihid',
-    password: 'ghj123',
+    url: process.env.DATABASE_URL,
     logging: true,
     synchronize: true,
     entities: [User, Event, Question],
@@ -32,11 +31,11 @@ const main = async () => {
   const app = express();
 
   const RedisStore = connectRedis(session);
-  const redis = new Redis();
+  const redis = new Redis(process.env.REDIS_URL);
 
   app.use(
     cors({
-      origin: 'http://localhost:3000',
+      origin: process.env.CORS_ORIGIN,
       credentials: true,
     })
   );
@@ -51,10 +50,10 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365,
         httpOnly: true,
         sameSite: 'lax',
-        secure: __prod__, // cookie only works in https
+        domain: __prod__ ? '.robihidayat.me' : undefined,
       },
       saveUninitialized: false,
-      secret: 'thesilvercatfeeds',
+      secret: process.env.SESSION_SECRET,
       resave: false,
     })
   );
@@ -70,8 +69,8 @@ const main = async () => {
 
   apolloServer.applyMiddleware({ app, cors: false });
 
-  app.listen(5000, () => {
-    console.log('listening on port 5000');
+  app.listen(parseInt(process.env.PORT), () => {
+    console.log('listening on port:', process.env.PORT);
   });
 };
 
