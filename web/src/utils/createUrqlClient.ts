@@ -66,21 +66,11 @@ const cursorPagination = (): Resolver => {
   };
 };
 
-export const createUrqlClient = (ssrExchange: any, ctx: any) => {
-  let cookie = '';
-  if (isServer()) {
-    cookie = ctx.req.headers.cookie;
-  }
-
+export const createUrqlClient = () => {
   return {
     url: 'http://localhost:5000/graphql',
     fetchOptions: {
       credentials: 'include' as const,
-      headers: cookie
-        ? {
-            cookie,
-          }
-        : undefined,
     },
     exchanges: [
       dedupExchange,
@@ -172,7 +162,6 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
         },
       }),
       errorExchange,
-      ssrExchange,
       fetchExchange,
     ],
   };

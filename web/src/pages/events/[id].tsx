@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { NextPage } from 'next';
-import { Box, Button, Flex, Heading, Link, Stack, Text } from '@chakra-ui/core';
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  IconButton,
+  Link,
+  Stack,
+  Text,
+} from '@chakra-ui/core';
 import NextLink from 'next/link';
 import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../../utils/createUrqlClient';
@@ -12,8 +21,15 @@ import {
 import { Form, Formik } from 'formik';
 import { InputField } from '../../components/InputField';
 import { VoteSection } from '../../components/VoteSection';
+import { cookies } from '../../utils/cookies';
+import { v4 } from 'uuid';
 
 const Event: NextPage<{ id: string }> = ({ id }) => {
+  const guestId = v4();
+  if (!cookies.get('iask_guestId')) {
+    cookies.set('iask_guestId', guestId, { path: '/', maxAge: 1 * 60 * 60 });
+  }
+
   const [variables, setVariables] = useState({
     eventId: parseInt(id),
     limit: 10,
@@ -42,7 +58,7 @@ const Event: NextPage<{ id: string }> = ({ id }) => {
           description: '',
         }}
         onSubmit={async (values, { resetForm }) => {
-          const { error } = await createQuestion({
+          const { error, data } = await createQuestion({
             input: { ...values, eventId: parseInt(id) },
           });
           if (!error) {
@@ -52,6 +68,10 @@ const Event: NextPage<{ id: string }> = ({ id }) => {
               limit: 10,
               cursor: null as null | string,
             });
+            cookies.set(
+              `qauthor_${data?.createQuestion.id}`,
+              cookies.get('iask_guestId')
+            );
           }
         }}
       >
@@ -91,7 +111,11 @@ const Event: NextPage<{ id: string }> = ({ id }) => {
               <VoteSection question={q} />
               <Box>
                 <Heading fontSize="xl">{q.authorName}</Heading>
-                <Text mt={4}>{q.description}</Text>
+                <Flex align="center">
+                  <Text flex={1} mt={4}>
+                    {q.description}
+                  </Text>
+                </Flex>
               </Box>
             </Flex>
           ))}
@@ -127,4 +151,4 @@ Event.getInitialProps = ({ query }) => {
   };
 };
 
-export default withUrqlClient(createUrqlClient)(Event);
+export default withUrqlClient(createUrqlClient, { ssr: false })(Event);
